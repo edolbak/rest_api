@@ -31,6 +31,7 @@ class UserController extends Controller
 //        $ses = $request->session()->all();
 //        dd($ses);
 
+
         $result = Http::timeout(10)
             ->get($this->api_host.'/api/v1/users?page='.$page.'&count='.$count);
 
