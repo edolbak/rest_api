@@ -1,29 +1,45 @@
-
 <x-guest-layout>
 
 
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
         @csrf
 
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')"  autofocus autocomplete="name" />
+{{--            <x-input-error :messages="$errors->get('name')" class="mt-2" />--}}
         </div>
 
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-text-input id="email" class="block mt-1 w-full" type="text" name="email" :value="old('email')"  autocomplete="username" />
+{{--            <x-input-error :messages="$errors->get('email')" class="mt-2" />--}}
         </div>
 
+        <!-- Phone -->
+        <div class="mt-4">
+            <x-input-label for="phone" :value="__('Phone')" />
+            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')"  />
+{{--            <x-input-error :messages="$errors->get('email')" class="mt-2" />--}}
+        </div>
+
+        <!-- Position -->
+        <div class="mt-4">
+            <x-input-label for="position_id" :value="__('Position')" />
+
+            <select name="position_id">
+                @foreach($positions as $position)
+                    <option value="{{$position['id']}}" >{{$position['name']}}</option>
+                @endforeach
+            </select>
+        </div>
+        <br>
+
         <div>
-
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input @disabled(true) id="email" class="block mt-1 w-full" type="email" name="email" :value="'zsdfsdfsdf" required autocomplete="username" />
-
+            <x-input-label for="photo" :value="__('Photo')" />
+            <x-text-input  type="file" class="form-control" name="photo" />
         </div>
 
         <!-- Password -->

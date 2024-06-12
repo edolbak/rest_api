@@ -20,7 +20,7 @@
                 <div><strong>Email:</strong>{{ $user['email'] }}</div>
                 <div><strong>Position:</strong>{{ $user['position'] }}</div>
                 <div><strong>Phone:</strong> {{ $user['phone'] }}</div>
-                <div><img src="{{$user['photo']}}" width="80" height="80"></div>
+                <div><img src="{{$user['photo']}}" width="70" height="70"></div>
             </div>
         </div>
     @endforeach

@@ -8,7 +8,8 @@ Route::apiResource('v1/users', UserController::class);
 
 Route::get('v1/positions', [PositionController::class, 'index']);
 Route::get('v1/token', [UserController::class, 'token'])->name('token');
-Route::get('v1/validate_token', [UserController::class, 'validate_token'])->name('validate_token');
+
+//Route::get('v1/validate_token', [UserController::class, 'validate_token'])->name('validate_token');
 
 //Route::get('v1/users', [UserController::class, 'index']);
 //Route::prefix('admin')->controller(UserController::class)->group(function (){

@@ -128,4 +128,6 @@ return [
     'api_jwt_iss' => env('JWT_ISS', 'https://api-cv-app.org'),
     'api_jwt_aud' => env('JWT_AUD', 'https://public-cv-app.com'),
 
+    'tinify_api_key' => env('TINIFY_API_KEY', 'WpK3DfNdgLzdnYPNjtmdJDxQR6Ckbq4z'),
+
 ];

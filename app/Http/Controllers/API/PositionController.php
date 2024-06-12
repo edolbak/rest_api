@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Position;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Http\Request;
 
 class PositionController extends Controller
@@ -13,8 +15,29 @@ class PositionController extends Controller
      */
     public function index()
     {
-        // TODO-vardump VAR_DUMP
-        die(var_dump(__CLASS__, '===>', __METHOD__));
+        try {
+            $positions = Position::all();
+
+            if($positions->isEmpty()){
+                $responseData = ['success' => false, 'message' => 'Positions not found'];
+                return response(json_encode($responseData), 404)
+                    ->header('Content-Type', 'application/json');
+            }
+
+            $responseData = ['success' => true, 'positions' => $positions];
+            return response(json_encode($responseData), 200)
+                ->header('Content-Type', 'application/json');
+
+        }catch (\Exception $e){
+            $responseData = ['success' => false, 'message' => 'Positions not found'];
+            return response(json_encode($responseData), 422)
+                ->header('Content-Type', 'application/json');
+        }
+
+        $responseData = ['success' => false, 'message' => 'Invalid image of phone field'];
+
+        return response(json_encode($positions), 401)
+            ->header('Content-Type', 'application/json');
 
     }
 
