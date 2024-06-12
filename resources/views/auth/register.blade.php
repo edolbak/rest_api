@@ -42,6 +42,12 @@
             <x-text-input  type="file" class="form-control" name="photo" />
         </div>
 
+        <br>
+        <br>
+        @error('error_message')
+        <h2 style="color: darkred">{{ $message }}</h2>
+        @enderror
+
         <!-- Password -->
 {{--        <div class="mt-4">--}}
 {{--            <x-input-label for="password" :value="__('Password')" />--}}

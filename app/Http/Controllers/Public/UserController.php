@@ -118,6 +118,10 @@ class UserController extends Controller
 
         $file_name = $request->hasfile('photo')?$request->file('photo')->store('photos-8002'):'';
 
+        if(!$file_name){
+            return back()->withErrors(['error_message'=>'Please, upload photo!']);
+        }
+
         $token = '';
         $token_response = Http::timeout(10)
             ->get($this->api_host . '/api/v1/token')->json();
@@ -152,12 +156,17 @@ class UserController extends Controller
                 ]);
 
             Storage::delete($file_name);
+
+            if($response->json()['success']){
+                return redirect()->route('list');
+            }else{
+                return back()->withErrors(['error_message'=>$response->json()['message']]);
+            }
+        }else{
+            return back()->withErrors(['error_message'=>'Photo not uploaded']);
         }
 
 
-
-
-        dd($response->json());
     }
 
     /**

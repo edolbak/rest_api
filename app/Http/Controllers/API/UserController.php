@@ -36,20 +36,22 @@ class UserController extends Controller
         $count = intval($request->get('count')) ?: 6;
         $page = intval($request->get('page')) ?: 1;
 
-        $users = DB::table('users')
-            ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
-            ->select(
-                'users.id',
-                'users.name',
-                'users.email',
-                'users.phone',
-                'users.position_id',
-                'positions.name as position',
-                'users.photo',
-                (DB::raw('UNIX_TIMESTAMP(users.created_at) as registration_timestamp'))
-            )
-            ->orderBy('id')
-            ->paginate(perPage: $count, page: $page);
+        $users = $this->getUsers(count: $count, page: $page);
+
+//        $users = DB::table('users')
+//            ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
+//            ->select(
+//                'users.id',
+//                'users.name',
+//                'users.email',
+//                'users.phone',
+//                'users.position_id',
+//                'positions.name as position',
+//                'users.photo',
+//                (DB::raw('UNIX_TIMESTAMP(users.created_at) as registration_timestamp'))
+//            )
+//            ->orderBy('id')
+//            ->paginate(perPage: $count, page: $page);
 
         foreach ($users->items() as &$item) {
             $this->formatUserData($item);
@@ -131,8 +133,7 @@ class UserController extends Controller
             $resized_name = str_replace('origin', 'cropped', $photo);
             $resized_path = str_replace('origin', 'cropped', $path_photo);
 
-            $resized = '';
-            $resized = $source->resize([
+            $source->resize([
                 "method" => "cover",
                 "width" => 70,
                 "height" => 70
@@ -148,12 +149,15 @@ class UserController extends Controller
                     'position_id' => $post['position_id'],
                     'photo' => $resized_name,
                     'remember_token' => $jwt,
-//                    'email_verified_at' => \DateTime::createFromFormat('Y-m-d H:i:s')->getTimestamp()
+                    'created_at' => now(),
+                    'email_verified_at' => now()
                 ]);
             } catch (Exception $e) {
-                $error = $e->getMessage();
-            }
+                $responseData = ['success' => false, 'message' => $e->getMessage()];
 
+                return response(json_encode($responseData), 500)
+                    ->header('Content-Type', 'application/json');
+            }
 
             return response(json_encode([
                 'success' => true,
@@ -167,19 +171,45 @@ class UserController extends Controller
             return response(json_encode($responseData), 401)
                 ->header('Content-Type', 'application/json');
         }
-
-
-
-
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        // TODO-vardump VAR_DUMP
-        die(var_dump(__CLASS__, '===>', __METHOD__));
+        $users = $this->getUsers(id: $id);
+
+        if(!intval($id)){
+            return response(json_encode([
+                'success' => false,
+                'message' => 'The user with the requested id does not exist',
+                'fails' => ['userId'=>['The user must be an integer.']],
+            ]), 400)
+                ->header('Content-Type', 'application/json');
+        }
+
+
+        if($users->toArray()){
+            foreach ($users->toArray() as &$item) {
+                $this->formatUserData($item);
+            }
+        }else{
+            return response(json_encode([
+                'success' => false,
+                'message' => 'User not found'
+            ]), 404)
+            ->header('Content-Type', 'application/json');
+        }
+
+
+        return response(json_encode([
+            'success' => true,
+            'user'=>$users->first(),
+        ]), 201)
+            ->header('Content-Type', 'application/json');
+
+
 
     }
 
@@ -311,5 +341,41 @@ class UserController extends Controller
         }
 
         return $ret;
+    }
+
+    private function getUsers($count=0, $page=0, $id=0)
+    {
+        $users = [];
+        if($count && $page){
+            $users = DB::table('users')
+                ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
+                ->select(
+                    'users.id',
+                    'users.name',
+                    'users.email',
+                    'users.phone',
+                    'users.position_id',
+                    'positions.name as position',
+                    'users.photo',
+                    (DB::raw('UNIX_TIMESTAMP(users.created_at) as registration_timestamp'))
+                )
+                ->orderBy('id')
+                ->paginate(perPage: $count, page: $page);
+        }elseif($id){
+            $users = DB::table('users')
+                ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
+                ->select(
+                    'users.id',
+                    'users.name',
+                    'users.email',
+                    'users.phone',
+                    'users.position_id',
+                    'positions.name as position',
+                    'users.photo',
+                    (DB::raw('UNIX_TIMESTAMP(users.created_at) as registration_timestamp'))
+                )->where('users.id', $id)->get();
+        }
+
+        return $users;
     }
 }
